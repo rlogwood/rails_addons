@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BlogHelper
 
   # format markdown if present, sanitize, add emojis and do syntax highlighting
