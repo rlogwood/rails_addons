@@ -1,0 +1,30 @@
+@layer components {
+
+  /* markdown styling for blog */
+  .blog {
+    p {
+      @apply text-blue-800 bg-gray-400
+    }
+
+    h1 {
+      @apply text-6xl font-bold
+    }
+
+    h2 {
+      @apply text-4xl font-bold
+    }
+
+    h3 {
+      @apply text-3xl font-bold
+    }
+
+    h4 {
+      @apply text-2xl font-bold
+    }
+
+    li {
+      @apply list-disc
+    }
+  }
+
+}
