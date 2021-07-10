@@ -1,0 +1,7 @@
+
+<p>
+  <strong>Files:</strong>
+  <% @post.files.each do |file| %>
+    <%= link_to file.filename, file, target: :blank %>
+  <% end %>
+</p>
