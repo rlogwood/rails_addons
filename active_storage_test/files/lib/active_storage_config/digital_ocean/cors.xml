@@ -11,6 +11,21 @@
     <ExposeHeaders>Content-MD5</ExposeHeaders>
     <ExposeHeaders>Content-Disposition</ExposeHeaders>
 
-    <AllowHeader>*</AllowHeader>
+    <AllowedHeader>*</AllowedHeader>
+  </CORSRule>
+
+  <CORSRule>
+    <AllowedOrigin>https://(myherokuapp).herokuapp.com</AllowedOrigin>
+
+    <AllowedMethod>GET</AllowedMethod>
+    <AllowedMethod>PUT</AllowedMethod>
+    <AllowedMethod>POST</AllowedMethod>
+
+    <ExposeHeaders>Origin</ExposeHeaders>
+    <ExposeHeaders>Content-Type</ExposeHeaders>
+    <ExposeHeaders>Content-MD5</ExposeHeaders>
+    <ExposeHeaders>Content-Disposition</ExposeHeaders>
+
+    <AllowedHeader>*</AllowedHeader>
   </CORSRule>
 </CORSConfiguration>

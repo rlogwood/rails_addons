@@ -25,9 +25,14 @@ end
 
 def update_storage_yml(template_dir)
   storage_additions_filename = File.join(template_dir, 'files/lib/active_storage_config/storage_additions.yml')
+  storage_config_filename = 'config/storage.yml'
   raise("Storage config not found (#{storage_additions_filename})") unless File.exist? storage_additions_filename
 
-  append_to_file('config/storage.yml') { File.read(storage_additions_filename)}
+  my_bucket_name = ask('What is your Digital Ocean spaces S3 bucket name?')
+  bucket_placeholder = 'bucket: (my bucket name)'
+  my_bucket = "bucket: #{my_bucket_name}"
+  append_to_file(storage_config_filename) { File.read(storage_additions_filename)}
+  gsub_file(storage_config_filename, bucket_placeholder, my_bucket)
 end
 
 def update_post_controller_params
@@ -56,14 +61,25 @@ def update_css(template_dir)
 end
 
 def copy_cors_config
-  copy_file('files/lib/active_storage_config/digital_ocean/cors.xml',
-            'lib/active_storage_config/digital_ocean/cors.xml', force: true)
+  app_cors_filename = 'lib/active_storage_config/digital_ocean/cors.xml'
+  heroku_app_placeholder_origin = '<AllowedOrigin>https://(myherokuapp).herokuapp.com</AllowedOrigin>'
+
+  my_app_name = ask('What your heroku app name?')
+  heroku_my_app_origin = "<AllowedOrigin>https://#{my_app_name}.herokuapp.com</AllowedOrigin>"
+  run "heroku apps:info #{my_app_name}"
+
+  puts "Updating CORS xml file (#{app_cors_filename})..."
+  puts "Adding heroku origin: (#{heroku_my_app_origin})"
+
+  copy_file('files/lib/active_storage_config/digital_ocean/cors.xml', app_cors_filename, force: true)
+  gsub_file(app_cors_filename, heroku_app_placeholder_origin, heroku_my_app_origin)
 end
 
-def update_production_environment
-  # use digital ocean spaces in prodution
+def update_environments
+  # use digital ocean spaces in development and production
   active_storage_service = 'config.active_storage.service = :spaces'
   gsub_file('config/environments/production.rb', /config.active_storage.service = :local/, active_storage_service)
+  gsub_file('config/environments/development.rb', /config.active_storage.service = :local/, active_storage_service)
 end
 
 def update_root_route
@@ -93,7 +109,7 @@ def add_active_storage
   update_application_js(template_dir)
   update_css(template_dir)
   update_root_route
-  update_production_environment
+  update_environments
   copy_cors_config
   update_gitignore
   copy_procfile
