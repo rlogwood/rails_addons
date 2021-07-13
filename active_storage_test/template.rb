@@ -1,30 +1,86 @@
-def do_bundle
-  # Custom bundle command ensures dependencies are correctly installed
-  Bundler.with_unbundled_env { run "bundle install" }
-end
+# frozen_string_literal: true
+
+# initialize generic template helpers
+require_relative '../lib/template_helpers'
+initialize_template_helpers(__FILE__)
+
+# default scaffold model for testing ActiveStorage 
+DEFAULT_MODEL = 'TestPost'.tableize.singularize
 
 def install_active_storage
   rails_command "active_storage:install"
 end
 
-def create_posts_scaffold_example(template_dir)
-  rails_command "destroy scaffold post"
-  generate(:scaffold, 'post', 'title:string', 'body:text')
-  insert_into_file('app/models/post.rb', before: /^end/) { "\nhas_many_attached :files\n" }
-
-  form_addition_filename = File.join(template_dir, 'files/views/_form_addition.html.erb')
-  show_addition_filename = File.join(template_dir, 'files/views/show_addition.html.erb')
-
-  insert_into_file('app/views/posts/_form.html.erb',
-                   after: %r{<%= form.text_field :title %>\n *</div>\n}m) { File.read(form_addition_filename) }
-
-  insert_into_file('app/views/posts/show.html.erb',
-                   after: %r{<strong>Body:</strong>.*<%= @post.body %>\n *</p>\n}m) { File.read(show_addition_filename) }
-
+def scaffold_form_filename(model_name)
+  "app/views/#{model_name.pluralize}/_form.html.erb"
 end
 
-def update_storage_yml(template_dir)
-  storage_additions_filename = File.join(template_dir, 'files/lib/active_storage_config/storage_additions.yml')
+def scaffold_view_show_filename(model_name)
+  "app/views/#{model_name.pluralize}/show.html.erb"
+end
+
+def scaffold_model_filename(model_name)
+  "app/models/#{model_name}.rb"
+end
+
+def scaffold_controller_filename(model_name)
+  "app/controllers/#{model_name.pluralize}_controller.rb"
+end
+
+def scaffold_exists?(model_name)
+  model_filename = scaffold_model_filename(model_name)
+  form_filename = scaffold_form_filename(model_name)
+
+  puts "* checking if scaffolding has already been generated for (#{model_name})..."
+  puts "* checking #{model_filename} ..."
+  puts "* checking #{form_filename} ..."
+  File.exist?(model_filename) || File.exist?(form_filename)
+end
+
+def choose_model_name
+  model_name = nil
+  loop do
+    model_name = ask('What name do you want to use for the scaffold model (use snake or camel case)?', default: DEFAULT_MODEL)
+    model_name = model_name.tableize.singularize
+    break unless scaffold_exists?(model_name)
+
+    puts "\n***\n*** The scaffolding for >>>(#{model_name})<<< already exists, please pick another name\n***\n"
+    puts "Choose another name or Ctrl-C out and remove it with bin/rails destroy and run the template again"
+  end
+  model_name
+end
+
+# generate scaffold for model and updated as needed for ActiveStorage test
+def create_example_scaffold_with_active_storage(model_name)
+  puts "\n*** Generating scaffolding for (#{model_name})"
+  generate(:scaffold, model_name, 'title:string', 'body:text')
+
+  # each instance of model will have a collection of ActiveStorage items called :files
+  inject_into_class(scaffold_model_filename(model_name),model_name.camelize) { "  has_many_attached :files\n" }
+
+  # view add-ins for editing and showing files collection
+  form_addition_filename = template_full_filename('views/_form_addition.html.erb')
+  show_addition_filename = template_full_filename('views/show_addition.html.erb')
+
+  # NOTE: make additions to form and views generic as possible to accommodate custom templates
+
+  # add files uploader to generic scaffold form
+  form_regex = %r{text_area :body[^%]+%>\n *</div>\n}m
+  insert_into_file(scaffold_form_filename(model_name), after: form_regex) { File.read(form_addition_filename) }
+
+  # add files links to the scaffold show form
+  additional_show_info = File.read(show_addition_filename).gsub('{#model_name}', model_name)
+  show_view_regex = /\.body[^%]+%>[^\n]*\n/m
+  insert_into_file(scaffold_view_show_filename(model_name), after: show_view_regex) { additional_show_info }
+
+  # update permitted parameters for model
+  update_scaffold_controller_permitted_params(model_name)
+end
+
+# configure DigitalOcean bucket for ActiveStorage
+def update_storage_yml
+  storage_additions_filename = template_full_filename('lib/active_storage_config/storage_additions.yml')
+
   storage_config_filename = 'config/storage.yml'
   raise("Storage config not found (#{storage_additions_filename})") unless File.exist? storage_additions_filename
 
@@ -35,31 +91,42 @@ def update_storage_yml(template_dir)
   gsub_file(storage_config_filename, bucket_placeholder, my_bucket)
 end
 
-def update_post_controller_params
-  new_post_params = <<~END_STRING
-      def post_params
-        params.require(:post).permit(:title, :body, files: [])
+# add ActiveStorage :files to permitted parameters
+def update_scaffold_controller_permitted_params(model_name)
+  new_params = <<~END_STRING
+      def #{model_name}_params
+        params.require(:#{model_name}).permit(:title, :body, files: [])
       end
     end
   END_STRING
 
-  gsub_file('app/controllers/posts_controller.rb', / *def post_params\n.*\n *end\n/m, new_post_params)
+  # params_regex = %r{ *def #{model_name}_params\n.*\n *end\n}m
+  params_regex = / *def #{model_name}_params\n.*\n *end\n/m
+  gsub_file(scaffold_controller_filename(model_name), params_regex, new_params)
 end
 
-def update_application_js(template_dir)
-  application_js_filename = 'app/javascript/packs/application.js'
-
-  raise "Only supporting Webpacker 5 - Missing #{application_js_filename}" unless File.exist?(application_js_filename)
+# add ActiveStorage support for direct uploads from javascript
+def update_application_js
+  application_js_filename = application_js_filename_for_webpacker
 
   append_to_file(application_js_filename, 'import "../src/direct_uploads"')
 
-  copy_file('files/javascript/direct_uploads.js', 'app/javascript/src/direct_uploads.js', force: true)
+  copy_file(template_relative_filename('javascript/direct_uploads.js'),
+            File.join(webpacker_javascript_files_dir, 'direct_uploads.js'),
+            force: true)
 end
 
-def update_css(template_dir)
-  copy_file('files/stylesheets/direct_uploads.css','app/assets/stylesheets/direct_uploads.css')
+# add ActiveStorage css for direct upload form fields
+def update_css
+  copy_file(template_relative_filename('stylesheets/direct_uploads.css'),
+            File.join(additional_stylesheets_dir, 'direct_uploads.css'))
+
+  return if asset_pipeline_app?
+
+  append_to_file(application_stylesheet_filename, '@import "../stylesheets/direct_uploads.css";')
 end
 
+# copy and customize CORS configuration for DigitalOcean buckets
 def copy_cors_config
   app_cors_filename = 'lib/active_storage_config/digital_ocean/cors.xml'
   heroku_app_placeholder_origin = '<AllowedOrigin>https://(myherokuapp).herokuapp.com</AllowedOrigin>'
@@ -71,45 +138,61 @@ def copy_cors_config
   puts "Updating CORS xml file (#{app_cors_filename})..."
   puts "Adding heroku origin: (#{heroku_my_app_origin})"
 
-  copy_file('files/lib/active_storage_config/digital_ocean/cors.xml', app_cors_filename, force: true)
+  copy_file(template_relative_filename('lib/active_storage_config/digital_ocean/cors.xml'), app_cors_filename, force: true)
   gsub_file(app_cors_filename, heroku_app_placeholder_origin, heroku_my_app_origin)
 end
 
+# use digital ocean spaces in development and production
 def update_environments
-  # use digital ocean spaces in development and production
   active_storage_service = 'config.active_storage.service = :spaces'
   gsub_file('config/environments/production.rb', /config.active_storage.service = :local/, active_storage_service)
   gsub_file('config/environments/development.rb', /config.active_storage.service = :local/, active_storage_service)
 end
 
-def update_root_route
-  route "root to: 'posts#index'"
+# make root route point to new test model scaffold created for this ActiveStorage test
+def update_root_route(model_name)
+  root_route = "root to: '#{model_name.pluralize}#index'"
+  routes_filename = File.join(destination_root,'config','routes.rb')
+  if file_has_string(routes_filename, /root/)
+    result = gsub_file('config/routes.rb', /root .*$/, root_route)
+  else
+    route root_route
+  end
 end
 
+# don't commit RubyMine, emacs backups or ruby version files
 def update_gitignore
   append_to_file('.gitignore', "\n.idea\n.ruby-version\n*~\n")
 end
 
+# basic Procfile for Heroku
 def copy_procfile
-  copy_file('files/Procfile', 'Procfile')
+  copy_file(template_relative_filename('Procfile'), 'Procfile')
 end
 
+# add needed S3 gem that facilitates the ActiveStorage connection with DigitalOcean spaces
 def update_gemfile
   gem 'aws-sdk-s3'
   do_bundle
 end
 
+# update application configuration to allow ActiveStorage updates to add to existing collection for model instance
+def update_application_rb
+  active_storage_config = "\n\n    # allow active storage updates to add to existing collection\n    config.active_storage.replace_on_assign_to_many = false\n"
+  insert_into_file('config/application.rb', before: /^  end\nend/m) { active_storage_config }
+end
+
+# perform the steps add an ActiveStorage test to the application
 def add_active_storage
-  template_dir = File.dirname(__FILE__)
-  source_paths.unshift(template_dir)
   install_active_storage
-  create_posts_scaffold_example(template_dir)
-  update_storage_yml(template_dir)
-  update_post_controller_params
-  update_application_js(template_dir)
-  update_css(template_dir)
-  update_root_route
+  model_name = choose_model_name
+  create_example_scaffold_with_active_storage(model_name)
+  update_storage_yml
+  update_application_js
+  update_css
+  update_root_route(model_name)
   update_environments
+  update_application_rb
   copy_cors_config
   update_gitignore
   copy_procfile

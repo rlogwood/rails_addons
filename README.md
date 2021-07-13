@@ -12,7 +12,16 @@
 ### Basic ActiveStorage test with Digital Ocean spaces
 This simple template distills down only the changes needed to make **NEW** Rails 6 app
 work with ActiveStorage using Digital Ocean spaces. Use this example as a simple 
-reference application to see how ActiveStorage works.
+reference application to see how ActiveStorage works. 
+
+**An advanced use case is to run the template for an existing application. Do this on a new,
+clean working branch so that you can see all the files that are added and changed.** The 
+template will support the following use cases:
+- using asset pipeline for css and webpacker 5 or 6 for javascript 
+- using webpacker 5 or 6 for both css and javascript
+- NOTE: Adding the template to existing applications has only been tested on webpacker 6 apps using webpacker for CSS
+
+
 
 <details>
 <summary>Example Run for Active Storage Test</summary>
@@ -26,18 +35,6 @@ cd ~/mystuff
 
 app_name=(your app name here)
 
-if [ -d $app_name ]
-then
-  echo "trying to drop db ${app_name}_development"
-  cd $app_name
-  bin/rails db:drop ${app_name}_development
-  cd ..
-  echo "removing old app $app_name"
-  rm -fr $app_name
-else
-  echo  "${app_name} is a new app creating it fresh"
-fi
-
 echo "creating a default rails app with postgresql"
 rails new $app_name -d postgresql
 
@@ -50,6 +47,9 @@ bin/rails app:template LOCATION=$template --trace
 
 bin/rails db:create
 bin/rails db:migrate
+
+# note install s3cmd (if you use brew: brew install s3cmd)
+# configure s3cmd with s3cmd --configure (https://docs.digitalocean.com/products/spaces/resources/s3cmd/)
 
 s3cmd setcors lib/active_storage_config/digital_ocean/cors.xml s3://(my bucket) 
  

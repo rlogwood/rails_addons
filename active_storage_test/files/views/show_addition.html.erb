@@ -1,7 +1,7 @@
 
 <p>
   <strong>Files:</strong>
-  <% @post.files.each do |file| %>
-    <%= link_to file.filename, file, target: :blank %>
+  <% @{#model_name}.files.each do |file| %>
+    <%= link_to file.filename, file %>
   <% end %>
 </p>
