@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# template filename : __FILE__
+# Example parameters
+# template_filename : __FILE__
 # branch_name_regex : %r{rails_templates/(.+)/tailwindcss_app/template.rb}
 # repo_path :  #"https://github.com/rlogwood/rails_templates.git",
 
