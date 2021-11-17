@@ -1,0 +1,38 @@
+@layer components {
+  .nav-link {
+    @apply block mt-4 md:inline-block md:mt-0 hover:text-white mr-4
+  }
+
+  .title {
+    @apply text-6xl font-bold
+  }
+
+  .subtitle {
+    @apply text-4xl font-semibold
+  }
+
+  .subsubtitle {
+    @apply text-lg font-medium italic
+  }
+
+  .article {
+    @apply m-auto justify-center w-6/12
+  }
+
+  /* is this p supposed to be in .article */
+  p {
+    @apply mb-2;
+
+    a {
+      @apply block mt-4 md:inline-block md:mt-0 hover:text-blue-800 mr-4 underline
+    }
+  }
+
+  h1 {
+    @apply text-6xl font-bold
+  }
+
+  h3 {
+    @apply text-3xl font-semibold
+  }
+}

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 # Running locally example:
 # template="~/src/repos/public/rails_addons/rails7_tailwind_config/template.rb"
 
@@ -70,14 +69,61 @@ end
 ## Boilerplate ends
 ##
 
+#"build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css"
+def update_files
+  # use postcss
+  gsub_file 'package.json', 'build:css": "tailwindcss -i', 'build:css": "tailwindcss --postcss -i'
+end
+
+def copy_files
+  # postcss config
+  copy_file('files/postcss.config.js', 'postcss.config.js')
+end
+
+def add_packages
+  # add packages needed for rails js and postcss import
+  packages = %w[@rails/request.js postcss-import postcss-nesting postcss-simple-vars]
+  packages.each { |package| run "yarn add #{package}" }
+end
+
+SAFE_DIRNAME = "safe_#{Time.new.strftime("%Y-%m-%d_%H:%M:%S_%L")}"
+
+def save_original_file(filename)
+  safe_dir = File.join(File.dirname(filename),SAFE_DIRNAME)
+  Dir.mkdir safe_dir unless Dir.exist?(safe_dir)
+  run "mv #{filename} #{safe_dir}"
+end
+
+def copy_new_file(filename)
+  save_original_file(filename)
+  copy_file(File.join('files', filename), filename)
+end
+
+def copy_new_dir(dirname)
+  directory(File.join('files', dirname), dirname)
+end
+
+def add_basic_landing_page
+  generate(:controller, 'tailwind_test', 'index')
+  copy_file('files/app/views/tailwind_test/index.html.erb', 'app/views/tailwind_test/index.html.erb',
+            { force: true })
+  #/home/dever/src/repos/public/rails_addons/rails7_tailwind_config/files/app/stylesheets/application.tailwind.css
+  copy_new_file('app/assets/stylesheets/application.tailwind.css')
+  copy_new_dir('app/assets/stylesheets/examples')
+  route "root to: 'tailwind_test#index'"
+end
+
+def add_rails7_tailwind_config
+  copy_files
+  update_files
+  add_packages
+  add_basic_landing_page
+end
 
 repo_path = 'https://github.com/rlogwood/rails_addons.git'
-
-
-template_filename = "https://raw.githubusercontent.com/rlogwood/rails_addons/main/rails7_tailwind_config/template.rb"
-#template_dir = add_template_repository_to_source_path(__FILE__, repo_path)
-template_dir = add_template_repository_to_source_path(template_filename, repo_path)
-
-
+template_dir = add_template_repository_to_source_path(__FILE__, repo_path)
 
 puts "template_dir:#{template_dir}"
+add_rails7_tailwind_config
+
+
