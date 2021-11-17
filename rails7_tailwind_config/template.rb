@@ -25,7 +25,7 @@ def clone_repo(template_filename, repo_path)
   repo_name = File.basename(repo_path,'.git')
   addon_name = File.dirname(template_filename).split('/')[-1]
   branch_name_regex = %r{#{repo_name}/(.+)/#{addon_name}/template.rb}
-  branch_name = template_filename[branch_name_regex(repo_name, addon_name), 1]
+  branch_name = template_filename[branch_name_regex, 1]
   puts "branch_name:(#{branch_name})"
 
   tempdir = Dir.mktmpdir("#{repo_name}-")
