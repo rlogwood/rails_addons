@@ -1,13 +1,22 @@
 # frozen_string_literal: true
 
-# Example parameters
-# template_filename : __FILE__
-# branch_name_regex : %r{rails_templates/(.+)/tailwindcss_app/template.rb}
-# repo_path :  #"https://github.com/rlogwood/rails_templates.git",
+## ** Include this boilerplate in every template that you want to source from github
+## ** It can't be required since the repo will be cloned by it
+## code for checking out template from repo if needed
+## see other usage examples:
+## https://raw.githubusercontent.com/excid3/jumpstart/master/template.rb
+## https://github.com/mattbrictson/rails-template
 
-def clone_repo(template_filename, repo_path, branch_name_regex)
+# clone_repo and check out branched referenced by template_filename
+def clone_repo(template_filename, repo_path)
   require "tmpdir"
-  tempdir = Dir.mktmpdir("rails_templates-")
+
+  repo_name = File.basename(repo_path,'.git')
+  addon_name = File.dirname(template_filename).split('/')[-1]
+  branch_name = template_filename[%r{#{repo_name}/(.+)/#{addon_name}/template.rb}, 1]
+  puts "branch_name:(#{branch_name})"
+
+  tempdir = Dir.mktmpdir("#{repo_name}-")
   puts "*** tempdir: (#{tempdir})"
 
   at_exit { FileUtils.remove_entry(tempdir) }
@@ -18,26 +27,24 @@ def clone_repo(template_filename, repo_path, branch_name_regex)
     tempdir
   ].map(&:shellescape).join(" ")
 
-  if (branch = template_filename[branch_name_regex, 1])
+  unless branch_name.nil?
     Dir.chdir(tempdir) do
-      git checkout: branch
+      git checkout: branch_name
     end
   end
 
   # template_dir
-  File.join(tempdir,"tailwindcss_app")
+  File.join(tempdir, addon_name)
 end
 
-# Copied from: https://raw.githubusercontent.com/excid3/jumpstart/master/template.rb
-# which it copied it from: https://github.com/mattbrictson/rails-template
 # Add this template directory to source_paths so that Thor actions like
 # copy_file and template resolve against our source files. If this file was
 # invoked remotely via HTTP, that means the files are not present locally.
 # In that case, use `git clone` to download them to a local temporary dir.
-def add_template_repository_to_source_path(template_filename, repo_path, branch_name_regex)
+def add_template_repository_to_source_path(template_filename, repo_path)
   template_dir =
-    if __FILE__ =~ %r{\Ahttps?://}
-      clone_repo(template_filename, repo_path, branch_name_regex)
+    if template_filename =~ %r{\Ahttps?://}
+      clone_repo(template_filename, repo_path)
     else
       File.dirname(template_filename)
     end
