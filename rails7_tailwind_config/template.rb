@@ -24,8 +24,7 @@ def clone_repo(template_filename, repo_path)
 
   repo_name = File.basename(repo_path,'.git')
   addon_name = File.dirname(template_filename).split('/')[-1]
-  branch_name_regex = %r{#{repo_name}/(.+)/#{addon_name}/template.rb}
-  branch_name = template_filename[branch_name_regex, 1]
+  branch_name = template_filename[%r{#{repo_name}/(.+)/#{addon_name}/template.rb}, 1]
   puts "branch_name:(#{branch_name})"
 
   tempdir = Dir.mktmpdir("#{repo_name}-")
@@ -73,6 +72,12 @@ end
 
 
 repo_path = 'https://github.com/rlogwood/rails_addons.git'
-template_dir = add_template_repository_to_source_path(__FILE__, repo_path)
+
+
+template_filename = "https://raw.githubusercontent.com/rlogwood/rails_addons/main/rails7_tailwind_config/template.rb"
+#template_dir = add_template_repository_to_source_path(__FILE__, repo_path)
+template_dir = add_template_repository_to_source_path(template_filename, repo_path)
+
+
 
 puts "template_dir:#{template_dir}"
