@@ -9,10 +9,16 @@
 # Apply the template
 # bin/rails app:template LOCATION=$template --trace
 
-
 # when loading from repo, unable to require_relative '../lib/config_paths'
-def clone_repo(template_filename, repo_path, branch_name_regex)
+def branch_name_regex(repo_name, addon_name)
+  %r{#{repo_name}/(.+)/#{addon_name}/template.rb}
+end
+
+def clone_repo(template_filename, repo_path)
   require "tmpdir"
+
+  repo_name = File.basename(repo_path,'.git')
+  addon_name = File.dirname(template_filename).split('/')[-1]
   tempdir = Dir.mktmpdir("rails_templates-")
   puts "*** tempdir: (#{tempdir})"
 
@@ -24,14 +30,14 @@ def clone_repo(template_filename, repo_path, branch_name_regex)
     tempdir
   ].map(&:shellescape).join(" ")
 
-  if (branch = template_filename[branch_name_regex, 1])
+  if (branch = template_filename[branch_name_regex(addon_name), 1])
     Dir.chdir(tempdir) do
       git checkout: branch
     end
   end
 
   # template_dir
-  File.join(tempdir,"tailwindcss_app")
+  File.join(tempdir, addon_name)
 end
 
 # Copied from: https://raw.githubusercontent.com/excid3/jumpstart/master/template.rb
@@ -40,10 +46,10 @@ end
 # copy_file and template resolve against our source files. If this file was
 # invoked remotely via HTTP, that means the files are not present locally.
 # In that case, use `git clone` to download them to a local temporary dir.
-def add_template_repository_to_source_path(template_filename, repo_path, branch_name_regex)
+def add_template_repository_to_source_path(template_filename, repo_path)
   template_dir =
     if __FILE__ =~ %r{\Ahttps?://}
-      clone_repo(template_filename, repo_path, branch_name_regex)
+      clone_repo(template_filename, repo_path)
     else
       File.dirname(template_filename)
     end
@@ -54,13 +60,8 @@ def add_template_repository_to_source_path(template_filename, repo_path, branch_
   template_dir
 end
 
-
-
 repo_path = 'https://github.com/rlogwood/rails_addons.git'
-addon_name = 'rails7_tailwind_config'
-branch_name_regex = %r{rails_addons/(.+)/#{addon_name}/template.rb}
 
-template_dir = add_template_repository_to_source_path(__FILE__, repo_path, branch_name_regex)
+template_dir = add_template_repository_to_source_path(__FILE__, repo_path)
 
 puts "template_dir:#{template_dir}"
-
