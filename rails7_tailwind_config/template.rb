@@ -103,7 +103,17 @@ def copy_new_dir(dirname)
   directory(File.join('files', dirname), dirname)
 end
 
-def add_basic_landing_page
+def add_esbuild_management
+  copy_new_dir('lib/tasks')
+  insert_into_file('package.json', after: "\"scripts\": {\n") do
+    <<-COMMANDS
+    "show_esbuild" : "bin/rails esbuild:show",
+    "kill_esbuild" : "bin/rails esbuild:kill",
+    COMMANDS
+  end
+end
+
+def add_test_tailwind_landing_page
   generate(:controller, 'tailwind_test', 'index')
   copy_file('files/app/views/tailwind_test/index.html.erb', 'app/views/tailwind_test/index.html.erb',
             { force: true })
@@ -117,7 +127,8 @@ def add_rails7_tailwind_config
   copy_files
   update_files
   add_packages
-  add_basic_landing_page
+  add_test_tailwind_landing_page
+  add_esbuild_management
 end
 
 repo_path = 'https://github.com/rlogwood/rails_addons.git'
