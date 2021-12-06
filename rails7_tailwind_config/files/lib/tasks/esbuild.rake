@@ -42,8 +42,11 @@ namespace :esbuild do
       pid.strip!
       kill_command = "kill -HUP #{pid}"
       puts kill_command
-      `#{kill_command}`
-      $CHILD_STATUS.success? ? killed_count += 1 : error_pids << pid
+      begin
+        system(kill_command) ? killed_count += 1 : error_pids << pid
+      rescue => e
+        puts "** ERROR: process kill failed for PID:#{pid} with error #{e.class}:#{e.message}"
+      end
     end
 
     puts "Successfully killed #{killed_count}."
