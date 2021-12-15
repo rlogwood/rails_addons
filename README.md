@@ -1,13 +1,32 @@
 # Bite-size Addons for an existing Rails App Using Templates
 
-## Usage
+# Usage
+
+The add-ons are named to indicate their purpose. The documentation is a WIP.
+To get started and experiment try one of the scripts in bin.
+
+## 1. Some add-ons require cloning the repo locally.
  1. Clone the repo locally
  2. Follow the steps in an example run, using your environment
 
-## Add-ons
+## 2. Other add-ons can be run directly from github.
+- For example to update the tailwind configuration of a 
+new rails 7 application with a basic setup: 
+    ```shell
+    bin/rails app:template LOCATION=https://raw.githubusercontent.com/rlogwood/rails_addons/main/add_tailwind_scaffold/template.rb --trace
+    ```
+## 3. Some add-ons work well together
+- For example, to create a basic rails 7 tailwind app with devise and a navigation bar use the provided script `bin/create_basic_twdr7_rails_app.rb`. 
+This script will run several add-ons in the right order to create a basic app. 
+    ```shell
+    ruby ~/src/repos/public/rails_addons/bin/create_basic_twdr7_rails_app.rb
+    ```
+
+
+## How to run specific Add-ons
 
 <details> 
-  <summary>Active Storage Test</summary>
+  <summary>Active Storage Test (requires clone)</summary>
 
 ### Basic ActiveStorage test with Digital Ocean spaces
 This simple template distills down only the changes needed to make **NEW** Rails 6 app

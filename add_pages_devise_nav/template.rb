@@ -54,15 +54,18 @@ end
 
 
 def add_navbar
-  files_to_copy = ['app/views/shared/_navigation.html.erb',
-                   'app/views/shared/_flash_messages.html.erb',
-                   'app/javascript/controllers/navigation_controller.js']
+  files_to_copy = %w[app/views/shared/_navigation.html.erb
+                     app/views/shared/_flash_messages.html.erb
+                     app/javascript/controllers/navigation_controller.js]
 
   files_to_copy.each do |filename|
     copy_file(File.join('files', filename), filename)
   end
 
   gsub_file 'app/views/layouts/application.html.erb', '    <%= yield %>', navigation_and_errors_layout
+
+  # update app/javascript/controllers/index.js
+  rails_command 'stimulus:manifest:update'
 end
 
 def add_basic_pages

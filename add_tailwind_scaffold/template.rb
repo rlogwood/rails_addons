@@ -11,6 +11,7 @@ require_relative '../lib/addon_helpers'
 # bin/rails app:template LOCATION=$template --trace
 
 # bin/rails app:template LOCATION=~/src/repos/public/rails_addons/add_tailwind_scaffold/template.rb --trace
+# bin/rails app:template LOCATION=https://raw.githubusercontent.com/rlogwood/rails_addons/main/add_tailwind_scaffold/template.rb --trace
 
 ## ====================================
 ## Boilerplate for all templates: START

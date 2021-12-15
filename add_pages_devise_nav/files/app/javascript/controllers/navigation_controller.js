@@ -1,4 +1,4 @@
-import { Controller } from 'stimulus'
+import { Controller } from '@hotwired/stimulus'
 
 /* Note: the click action on a link href causes a new request and reinitialization of the controller
  * therefore it looks like data-action="navigation#hide" *is not needed* on these elements
