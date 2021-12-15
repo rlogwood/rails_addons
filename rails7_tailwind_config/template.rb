@@ -3,7 +3,7 @@
 # template="~/src/repos/public/rails_addons/rails7_tailwind_config/template.rb"
 
 # Running remotely:
-# template="https://raw.githubusercontent.com/rlogwood/rails_addons/main/active_storage_test/template.rb"
+# template="https://raw.githubusercontent.com/rlogwood/rails_addons/main/rails7_tailwind_config/template.rb"
 
 # Apply the template
 # bin/rails app:template LOCATION=$template --trace
@@ -96,7 +96,7 @@ def add_test_tailwind_landing_page
   copy_file('files/app/views/tailwind_test/index.html.erb', 'app/views/tailwind_test/index.html.erb',
             { force: true })
   copy_new_file('app/assets/stylesheets/application.tailwind.css')
-  copy_new_dir('app/assets/stylesheets/examples')
+  copy_new_dir('app/assets/stylesheets/components')
 end
 
 def user_instructions

@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
-## ** Include this boilerplate in every template that you want to source from github
-## ** It can't be required since the repo will be cloned by it
-## code for checking out template from repo if needed
+## ** You can include this boilerplate in every template that you want to source from github
+## ** or include the code repo_require.rb in your template to load this file from the repo
 ## see other usage examples:
 ## https://raw.githubusercontent.com/excid3/jumpstart/master/template.rb
 ## https://github.com/mattbrictson/rails-template

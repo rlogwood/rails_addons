@@ -7,9 +7,9 @@
 @import "tailwindcss/utilities";
 /*@import "./custom-utilities.css";*/
 
-@import 'examples/buttons.pcss';
-@import 'examples/forms.pcss';
-@import 'examples/tailwind_test.pcss';
+@import 'components/buttons.pcss';
+@import 'components/forms.pcss';
+@import 'components/tailwind_test.pcss';
 
 
 

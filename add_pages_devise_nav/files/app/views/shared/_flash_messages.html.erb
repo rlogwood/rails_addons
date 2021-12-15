@@ -1,0 +1,17 @@
+
+<div class="bg-red-200 text-red-600 mb-6" role="alert">
+  <div class="flex items-start justify-start">
+
+    <% if flash[:notice] %>
+      <div class="leading-normal" role="alert">
+        <%= flash[:notice] %>
+      </div>
+    <% end %>
+
+    <% if flash[:alert] %>
+      <div class="leading-normal" role="alert">
+        <%= flash[:alert] %>
+      </div>
+    <% end %>
+  </div>
+</div>
