@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 require_relative '../lib/addon_helpers'
+require_relative '../lib/thor_addons'
+
+class << self
+  include ThorAddons
+end
 
 # Running locally example:
 # template="~/src/repos/public/rails_addons/add_devise/template.rb"
@@ -90,8 +95,8 @@ def add_devise
 
   model_name = ask("What do you want to call your Devise model [user] ?")
   model_name = "user" if model_name.blank?
-  attributes = ""
-  if yes?("Do you want to any extra attributes to #{model_name}? [y/N]")
+  attributes = "role:string"
+  if yes?("Do you want to any extra attributes to #{model_name} (default:#{attributes})? [y/N]")
     attributes = ask("What attributes?")
   end
 
@@ -115,12 +120,6 @@ def add_devise
   insert_into_file('app/helpers/application_helper.rb', after: "module ApplicationHelper\n") do
     USE_TURBO_FOR_DEVISE
   end
-end
-
-# TODO: research this, from Chris' RailsBytes for devise
-def do_bundle
-  # Custom bundle command ensures dependencies are correctly installed
-  Bundler.with_unbundled_env { run "bundle install" }
 end
 
 def update_devise_db_migration

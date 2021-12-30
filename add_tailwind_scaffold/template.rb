@@ -55,18 +55,57 @@ end
 
 # NOTE: Thor directory command tries to evaluate templates (files ending in .tt)
 # so we hae to have our own copy command
-def no_eval_copy_dir(source_dir, destination_dir)
-  run "rm -fr #{destination_dir}"
-  run "mkdir  -p #{destination_dir}"
+def copy_dir(source_dir, destination_dir)
   copy_target_dir = File.join(destination_dir,"..")
-  run "cp -pfR #{source_dir} #{copy_target_dir}"
+  commands = [
+    "rm -fr #{destination_dir}",
+    "mkdir  -p #{destination_dir}",
+    "cp -pfR #{source_dir} #{copy_target_dir}"
+  ]
+
+  commands.each do |cmd|
+    next if AddonHelpers.sys(cmd)
+
+    puts "\n** ERROR running command:\n** #{cmd}\n** \n"
+    return false
+  end
+
+  true
 end
 
+# def test_copy_dir(source_dir, destination_dir)
+#   directory source_dir, destination_dir
+# end
+# def copy_template_files(template_dir)
+#   # add tailwind scaffolding templates
+#   source_dir = File.join(template_dir,'files', 'lib', 'templates')
+#   destination_dir = File.join('lib','templates')
+#   # NOTE: Thor directory command tries to evaluate templates (files ending in .tt)
+#   # so we hae to have our own copy command
+#   copy_dir(source_dir, destination_dir)
+# end
+#
+# def copy_dir(source_dir, destination_dir)
+#   run "rm -fr #{destination_dir}"
+#   run "mkdir  -p #{destination_dir}"
+#   copy_target_dir = File.join(destination_dir,"..")
+#   run "cp -pfR #{source_dir} #{copy_target_dir}"
+# end
 
-def copy_template_files
+# error messages partial used for templates
+def copy_error_message_partial
+  filename = 'app/views/application/_error_messages.html.erb'
+
+  copy_file(AddonHelpers.source_location(filename), filename, force: true)
+end
+
+def copy_template_files(template_dir)
   # add tailwind scaffolding templates
-  templates_dir = 'lib/templates'
-  no_eval_copy_dir(AddonHelpers.source_dir(templates_dir), templates_dir)
+  scaffold_templates_dir = 'lib/templates/erb'
+  source_dir = File.join(template_dir, AddonHelpers.source_location(scaffold_templates_dir))
+  #no_eval_copy_dir(AddonHelpers.source_dir(templates_dir), templates_dir)
+  #directory AddonHelpers.source_location(templates_dir), templates_dir
+  copy_dir(source_dir, scaffold_templates_dir)
 end
 
 repo_require('https://raw.githubusercontent.com/rlogwood/rails_addons/main',
@@ -75,4 +114,5 @@ repo_require('https://raw.githubusercontent.com/rlogwood/rails_addons/main',
 repo_path = 'https://github.com/rlogwood/rails_addons.git'
 template_dir = add_template_repository_to_source_path(__FILE__, repo_path)
 puts "Template directory is #{template_dir}"
-copy_template_files
+copy_template_files(template_dir)
+copy_error_message_partial

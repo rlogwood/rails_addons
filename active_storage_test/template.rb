@@ -1,4 +1,9 @@
 # frozen_string_literal: true
+require_relative '../lib/thor_addons'
+
+class << self
+  include ThorAddons
+end
 
 # initialize generic template helpers
 require_relative '../lib/template_helpers'

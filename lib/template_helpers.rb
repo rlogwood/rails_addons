@@ -58,11 +58,6 @@ def template_full_filename(file)
   filename
 end
 
-# Custom bundle command ensures dependencies are correctly installed
-def do_bundle
-  Bundler.with_unbundled_env { run "bundle install" }
-end
-
 # current app users webpacker 5 if of javascript pack for webpacker 5 exists
 def webpacker_5_app?
   File.exist?(@webpacker_5_application_js)
