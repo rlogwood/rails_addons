@@ -13,9 +13,8 @@ def create_rails_7_app_with_tailwind(app_name)
   sys("rails new #{app_name} -m #{template_file} -j esbuild --css tailwind --database postgresql")
 end
 
-def apply_templates(app_name)
+def apply_templates(template_dir, app_name)
 
-  location = File.join(File.dirname(__FILE__),"..")
 
   templates = %w[rails7_tailwind_config
                  add_tailwind_scaffold
@@ -27,7 +26,9 @@ def apply_templates(app_name)
 
   template_error = false
   templates.each do |name|
-    cmd = "bin/rails app:template LOCATION=\"#{location}/#{name}/template.rb\" --trace"
+    template_file = File.join(template_dir, name,'template.rb')
+    cmd = "bin/rails app:template LOCATION=\"#{template_file}\" --trace"
+
     unless sys(cmd)
       puts "\n** ERROR in template (#{name})"
       template_err = true
@@ -42,17 +43,22 @@ def apply_templates(app_name)
   sys('bin/rails db:prepare')
 end
 
-def create_admin_user
-  create_admin_user_script = File.join(File.dirname(__FILE__), 'create_admin_user.rb')
+def create_admin_user(template_dir)
+  create_admin_user_script = File.join(template_dir, 'bin', 'create_admin_user.rb')
   sys("bin/rails runner #{create_admin_user_script}")
 end
 
-print "Enter your app name: "
-app_name = gets.chomp
-create_rails_7_app_with_tailwind(app_name)
+def create_app
+  template_dir = File.expand_path(File.join(File.dirname(__FILE__),'..'))
+  puts "template_dir:(#{template_dir})"
+  print "Enter your app name: "
+  app_name = gets.chomp
+  create_rails_7_app_with_tailwind(app_name)
 
-Dir.chdir(File.join(Dir.pwd,app_name))
-apply_templates(app_name)
-create_admin_user
+  Dir.chdir(File.join(Dir.pwd,app_name))
+  apply_templates(template_dir, app_name)
+  create_admin_user(template_dir)
+end
 
 
+create_app
