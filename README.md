@@ -28,17 +28,30 @@ This script will run several add-ons in the right order to create a basic app.
   <summary>Creating basic Rails 7, tailwind, devise app </summary>
 This script will run the following add-on templates in order to create 
 Rails 7 TailwindCSS application with Devise authentication, 
-a navigation bar and several pages (home, about, services)
+a navigation bar and several pages (home, about, services), a blog and post model.
+The script will prompt for an email address and password and add an admin 
+user that can create posts. 
 
-- rails7_tailwind_config
-- add_tailwind_scaffold
-- add_devise
-- add_pages_devise_nav
+-  rails7_tailwind_config
+-  add_tailwind_scaffold
+-  add_devise
+-  add_pages_devise_nav
+-  add_cancancan
+-  add_blog
+-  add_error_pages
+
+###Create the app:
+- _NOTE: Most of the individual addons can be run directly from the repo
+but to run the script that creates the app applying all the above addons , you must first clone the repo_
 
   ```shell
-  wget https://raw.githubusercontent.com/rlogwood/rails_addons/main/bin/create_basic_twdr7_rails_app.rb
-  ruby create_basic_twdr7_rails_app.rb
+  # clone the repo
+  # run the ruby script
+  % (repo_location)/bin/create_rails_app.rb
   ```
+
+- _TODOs: WIP, improve layout and styling_
+
 </details>
 
 ## How to run specific Add-ons
