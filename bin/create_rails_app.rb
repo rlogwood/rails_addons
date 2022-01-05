@@ -22,6 +22,7 @@ def apply_templates(template_dir, app_name)
                  add_pages_devise_nav
                  add_cancancan
                  add_blog
+                 add_error_pages
                 ]
 
   template_error = false

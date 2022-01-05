@@ -46,6 +46,21 @@ end
 ## Boilerplate for all templates: END
 ## ====================================
 
+def add_access_denied_handler_to_application_controller
+  after_regex = %r{class ApplicationController < ActionController::Base\n}m
+  app_filename = "app/controllers/application_controller.rb"
+  insert_into_file(app_filename, after: after_regex) do
+    <<-RUBY
+  rescue_from CanCan::AccessDenied do |e|
+    # NOTE: if you don't want to show a permission error
+    # redirect_to not_found_error_path
+
+    # show permission error
+    redirect_to root_url, alert: e.message
+  end
+    RUBY
+  end
+end
 
 def update_navigation
   update = <<-END_STRING
@@ -166,6 +181,7 @@ def add_blog(options, perform_migration_rollback)
   update_navigation
   update_user_for_cancan_abilities_and_posts(template_dir)
   update_css
+  add_access_denied_handler_to_application_controller
   rails_command "db:prepare", abort_on_failure: true
 end
 
