@@ -40,7 +40,7 @@ user that can create posts.
 -  add_blog
 -  add_error_pages
 
-###Create the app:
+### Create the app:
 - _NOTE: Most of the individual addons can be run directly from the repo
 but to run the script that creates the app applying all the above addons , you must first clone the repo_
 
