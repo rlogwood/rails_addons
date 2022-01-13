@@ -48,6 +48,28 @@ def create_admin_user(template_dir)
   sys("bin/rails runner #{create_admin_user_script}")
 end
 
+def update_git_ignore
+  rules = <<-STRING
+# ignore jetbrains IDE files
+.idea/
+
+# ignore emacs backup files
+*~
+
+# ignore chruby version files
+.ruby-version
+STRING
+
+  open('.gitignore', 'a') { |f|
+    f << rules
+  }
+end
+
+def perform_initial_commit
+  sys('git add .')
+  sys('git commit -m "initial version create_rails_app.rb"')
+end
+
 def create_app
   template_dir = File.expand_path(File.join(File.dirname(__FILE__),'..'))
   puts "template_dir:(#{template_dir})"
@@ -58,7 +80,9 @@ def create_app
   Dir.chdir(File.join(Dir.pwd,app_name))
   apply_templates(template_dir, app_name)
   create_admin_user(template_dir)
+  perform_initial_commit
 end
 
-
 create_app
+update_git_ignore
+perform_initial_commit
