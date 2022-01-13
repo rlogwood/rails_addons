@@ -10,11 +10,10 @@ end
 
 def create_rails_7_app_with_tailwind(app_name)
   template_file='~/src/repos/public/rails_addons/use_rails_main/template.rb'
-  sys("rails new #{app_name} -m #{template_file} -j esbuild --css tailwind --database postgresql")
+  sys("rails new #{app_name} -T -m #{template_file} -j esbuild --css tailwind --database postgresql")
 end
 
 def apply_templates(template_dir, app_name)
-
 
   templates = %w[rails7_tailwind_config
                  add_tailwind_scaffold

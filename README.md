@@ -16,12 +16,8 @@ new rails 7 application with a basic setup:
     bin/rails app:template LOCATION=https://raw.githubusercontent.com/rlogwood/rails_addons/main/add_tailwind_scaffold/template.rb --trace
     ```
 ## 3. Some add-ons work well together
-- For example, to create a basic rails 7 tailwind app with devise and a navigation bar use the provided script `bin/create_basic_twdr7_rails_app.rb`. 
+- For example, to create a basic rails 7 tailwind app with devise, a navigation bar and blog use the provided script `bin/create_rails_app.rb`. 
 This script will run several add-ons in the right order to create a basic app. 
-    ```shell
-    wget https://raw.githubusercontent.com/rlogwood/rails_addons/main/bin/create_basic_twdr7_rails_app.rb
-    ruby create_basic_twdr7_rails_app.rb
-    ```
 
 ## Recipies
 <details> 
