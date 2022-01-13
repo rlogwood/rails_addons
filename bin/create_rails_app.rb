@@ -80,9 +80,8 @@ def create_app
   Dir.chdir(File.join(Dir.pwd,app_name))
   apply_templates(template_dir, app_name)
   create_admin_user(template_dir)
+  update_git_ignore
   perform_initial_commit
 end
 
 create_app
-update_git_ignore
-perform_initial_commit
