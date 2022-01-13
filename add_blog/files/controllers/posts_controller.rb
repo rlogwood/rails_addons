@@ -1,4 +1,7 @@
 class PostsController < ApplicationController
+  # added to enable intellisense, @post set by cancancan
+  attr_reader :post
+
   # The cancancan load_and_authorize_resource takes care of several things automatically
   # see docs at: https://github.com/cancancommunity/cancancan/wiki/authorizing-controller-actions
   # permissions: :create, :read, :update, :destroy; also there is :manage that lets you do everything (good for admins)
@@ -21,7 +24,6 @@ class PostsController < ApplicationController
   # 8. replaces the private set_post method
   load_and_authorize_resource
 
-
   # GET /posts or /posts.json
   def index; end
 
@@ -29,7 +31,9 @@ class PostsController < ApplicationController
   def show; end
 
   # GET /posts/new
-  def new; end
+  def new
+    post.user = current_user
+  end
 
   # GET /posts/1/edit
   def edit; end

@@ -84,6 +84,7 @@ def update_routes
 end
 
 def remove_post_scaffold(perform_rollback)
+  # TODO: perform_rollback is a debugging feature, revisit
   rails_command 'db:rollback STEP=1' if perform_rollback
   rails_command "destroy scaffold post"
 end
@@ -104,6 +105,17 @@ def add_published_scope_to_posts
   app_filename = 'app/models/post.rb'
   update = "\n  scope :published_posts, -> { where(published: true) }\n\n"
   insert_into_file(app_filename, before: /^end/) { update }
+end
+
+def add_active_record_post_callbacks
+  app_filename = 'app/models/post.rb'
+  code = <<-RUBY
+  before_save do
+    self.publish_date = DateTime.now if published && publish_date.nil?
+  end
+  RUBY
+
+  insert_into_file(app_filename, before: /^end/) { code }
 end
 
 def update_cancancan_abilities(template_dir)
@@ -174,20 +186,37 @@ def update_css
   copy_file('files/packs/stylesheets/rogue.pcss.erb', 'app/assets/stylesheets/components/rogue.pcss.erb', force: true)
 end
 
-def add_blog(options, perform_migration_rollback)
-  template_dir = File.dirname(__FILE__)
+
+def add_rbs_files
+  files_to_copy = %w[sig/app/controllers/posts_controller.rbs
+                     sig/app/models/post.rbs]
+  files_to_copy.each do |filename|
+    copy_file(File.join('files', filename), filename)
+  end
+end
+
+# These changes enable intellisense for Post model in Rubymine v2021.3.1
+# May extend later to include other models, but limited to Post for now
+def add_rbs_for_rubymine_intellisense
+  add_rbs_files
+
+end
+
+def add_blog(template_dir, options, perform_migration_rollback)
   source_paths.unshift(template_dir)
   remove_post_scaffold(perform_migration_rollback)
   create_post_scaffold(options)
   add_html_pipeline_gems
   add_blog_files
   add_published_scope_to_posts
+  add_active_record_post_callbacks
   update_cancancan_abilities(template_dir)
   update_routes
   update_navigation
   update_user_for_cancan_abilities_and_posts(template_dir)
   update_css
   add_access_denied_handler_to_application_controller
+  add_rbs_for_rubymine_intellisense
   rails_command "db:prepare", abort_on_failure: true
 end
 
@@ -198,6 +227,6 @@ repo_path = 'https://github.com/rlogwood/rails_addons.git'
 template_dir = add_template_repository_to_source_path(__FILE__, repo_path)
 puts "Template directory is #{template_dir}"
 
-
-add_blog("--migration", true)
+# TODO: migration rollback needs fresh look, option added during iteration on this template, seems obsolete now
+add_blog(template_dir,"--migration", false)
 

@@ -1,0 +1,32 @@
+class PostsController < ApplicationController
+  attr_reader post: Post
+
+  # GET /posts or /posts.json
+  def index: () -> nil
+
+  # GET /posts/1 or /posts/1.json
+  def show: () -> nil
+
+  # GET /posts/new
+  def new: () -> untyped
+
+  # GET /posts/1/edit
+  def edit: () -> nil
+
+  # POST /posts or /posts.json
+  def create: () -> untyped
+
+  # PATCH/PUT /posts/1 or /posts/1.json
+  def update: () -> untyped
+
+  # DELETE /posts/1 or /posts/1.json
+  def destroy: () -> untyped
+
+  private
+
+  # NOTE: cancancan will in the absence of (singular model name)_params look for
+  # function specific names like, create_params, update_params. This allows support
+  # of separate different forms for these actions
+  # Only allow a list of trusted parameters through.
+  def post_params: () -> untyped
+end
