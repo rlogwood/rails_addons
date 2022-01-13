@@ -2,6 +2,9 @@
 require_relative '../lib/addon_helpers'
 require_relative '../lib/thor_addons'
 
+# TODO: 1. standardize file placement under files/app throughout addons
+# TODO: 2. improve/standardize file handling throughout addons after #1
+
 class << self
   include ThorAddons
 end
@@ -153,14 +156,17 @@ end
 
 def add_blog_files
   copy_file('files/helpers/blog_helper.rb', 'app/helpers/blog_helper.rb')
-  copy_file('files/views/blog.html.erb', 'app/views/pages/blog.html.erb')
+  copy_file('files/views/pages/blog.html.erb', 'app/views/pages/blog.html.erb')
+
+  # TODO: Update scaffolding to remove the need for this customization
+  copy_file('files/views/posts/_form.html.erb', 'app/views/posts/_form.html.erb', force: true)
+
   copy_file('files/controllers/posts_controller.rb', 'app/controllers/posts_controller.rb', force: true)
+
   add_blog_to_pages_controller
 end
 
 def update_css
-
-  puts("\n***\n*** Fix This \n***\n")
   insert_into_file('app/assets/stylesheets/application.tailwind.css',
                    after: "@import 'components/elements.pcss';") { %(\n@import 'components/blog.pcss';) }
   #append_to_file('app/packs/entrypoints/application.js', 'import "../stylesheets/rogue.scss.erb"')

@@ -5,6 +5,9 @@
 The add-ons are named to indicate their purpose. The documentation is a WIP.
 To get started and experiment try one of the scripts in bin.
 
+Note, the utilities create Rails 7 apps. For newbies to Rails 7, to start the app, `cd` to the app directory 
+and run `bin/dev`. Visit `localhost:3000` in your browser.
+
 ## 1. Some add-ons require cloning the repo locally.
  1. Clone the repo locally
  2. Follow the steps in an example run, using your environment

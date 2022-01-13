@@ -4,7 +4,27 @@
 }
 
 .input:focus {
-  @apply outline-none bg-white border-gray-400;
+  @apply outline-offset-2 outline-1 bg-white border-gray-400;
+}
+
+.checkbox {
+  @apply bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight;
+}
+
+.checkbox:focus {
+  @apply outline-offset-2 outline-1 bg-white border-gray-400;
+}
+
+.select-list {
+  @apply block bg-gray-100 text-gray-700 border border-gray-300 rounded py-3 px-4 leading-tight;
+}
+
+.select-list:focus {
+  @apply outline-offset-2 outline-1 bg-white border-gray-400;
+}
+
+.inline-label {
+  @apply text-gray-700 text-sm font-bold mb-2;
 }
 
 .label {
