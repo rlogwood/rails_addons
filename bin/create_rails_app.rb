@@ -8,8 +8,8 @@ def sys(cmd, *args, **kwargs)
   $?.success?
 end
 
-def create_rails_7_app_with_tailwind(app_name)
-  template_file='~/src/repos/public/rails_addons/use_rails_main/template.rb'
+def create_rails_7_app_with_tailwind(template_dir, app_name)
+  template_file= File.join(template_dir, 'rails_initial_config/template.rb')
   sys("rails new #{app_name} -T -m #{template_file} -j esbuild --css tailwind --database postgresql")
 end
 
@@ -75,7 +75,7 @@ def create_app
   puts "template_dir:(#{template_dir})"
   print "Enter your app name: "
   app_name = gets.chomp
-  create_rails_7_app_with_tailwind(app_name)
+  create_rails_7_app_with_tailwind(template_dir, app_name)
 
   Dir.chdir(File.join(Dir.pwd,app_name))
   apply_templates(template_dir, app_name)
