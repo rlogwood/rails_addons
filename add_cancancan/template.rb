@@ -67,8 +67,8 @@ end
 
 def add_cancancan
   gem 'cancancan'
-  rails_command 'g cancan:ability'
   do_bundle
+  rails_command 'g cancan:ability'
 end
 
 # **

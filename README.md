@@ -1,5 +1,9 @@
 # Bite-size Addons for an existing Rails App Using Templates
 
+### NOTE:
+Rails 7 [redis for turbo-streams](https://github.com/hotwired/turbo-rails/issues/225). 
+For Ubuntu 20.04.4, Rails 7.0.2.2 and ruby 3.1.1p18 this was a manual install `gem install redis`
+
 # Usage
 
 The add-ons are named to indicate their purpose. The documentation is a WIP.
